@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "silktouchspawners",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "SilkTouchSpawners",
+  "description": "Spawners can be mined with silk touch.",
   "authors": [
-    "Me!"
+    "Matrixhacker"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/matrixhacker/SilkTouchSpawner"
   },
 
   "license": "CC0-1.0",
@@ -19,11 +19,11 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "twdne.silktouchspawners.SilkTouchSpawners"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "silktouchspawners.mixins.json"
   ],
 
   "depends": {
@@ -31,8 +31,5 @@
     "fabric-api": "*",
     "minecraft": "~1.19",
     "java": ">=17"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }
