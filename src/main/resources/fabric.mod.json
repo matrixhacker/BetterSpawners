@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "silktouchspawners",
+  "id": "betterspawners",
   "version": "${version}",
 
-  "name": "SilkTouchSpawners",
-  "description": "Spawners can be mined with silk touch.",
+  "name": "BetterSpawners",
+  "description": "Spawners can be mined with silk touch and changed to new mobs.",
   "authors": [
     "Matrixhacker"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/matrixhacker/SilkTouchSpawner"
+    "sources": "https://github.com/matrixhacker/BetterSpawners"
   },
 
   "license": "CC0-1.0",
@@ -19,11 +19,11 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "twdne.silktouchspawners.SilkTouchSpawners"
+      "twdne.betterspawners.BetterSpawners"
     ]
   },
   "mixins": [
-    "silktouchspawners.mixins.json"
+    "betterspawners.mixins.json"
   ],
 
   "depends": {

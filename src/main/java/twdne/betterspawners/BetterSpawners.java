@@ -1,12 +1,12 @@
-package twdne.silktouchspawners;
+package twdne.betterspawners;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import twdne.silktouchspawners.block.BetterSpawnerBlock;
-import twdne.silktouchspawners.event.EventHandler;
+import twdne.betterspawners.block.BetterSpawnerBlock;
+import twdne.betterspawners.event.EventHandler;
 
-public class SilkTouchSpawners implements ModInitializer {
+public class BetterSpawners implements ModInitializer {
 
 	private static final EventHandler eventHandler = new EventHandler();
 

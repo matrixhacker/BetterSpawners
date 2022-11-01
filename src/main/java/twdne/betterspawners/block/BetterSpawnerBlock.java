@@ -1,4 +1,4 @@
-package twdne.silktouchspawners.block;
+package twdne.betterspawners.block;
 
 import com.google.common.collect.Iterables;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;

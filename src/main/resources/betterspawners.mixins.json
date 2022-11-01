@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "twdne.silktouchspawners.mixin",
+  "package": "twdne.betterspawners.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "BlockItemMixin",

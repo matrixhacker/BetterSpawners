@@ -1,4 +1,4 @@
-package twdne.silktouchspawners.mixin;
+package twdne.betterspawners.mixin;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import twdne.silktouchspawners.block.BetterSpawnerBlock;
+import twdne.betterspawners.block.BetterSpawnerBlock;
 
 @Mixin(LivingEntity.class)
 public abstract class OnDeathMixin {
