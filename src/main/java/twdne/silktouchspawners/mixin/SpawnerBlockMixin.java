@@ -14,6 +14,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(SpawnerBlock.class)
 public class SpawnerBlockMixin {
 
+	/**
+	 * Cancel XP drop from spawner if mined with silk touch.
+	 */
 	@ModifyVariable(method = "onStacksDropped", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockWithEntity;onStacksDropped(Lnet/minecraft/block/BlockState;Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/item/ItemStack;Z)V", shift = At.Shift.BEFORE), argsOnly = true)
 	public boolean cancelXP(boolean dropExperience1, BlockState state, ServerWorld world, BlockPos pos, ItemStack stack, boolean dropExperience) {
 		return !EnchantmentHelper.get(stack).containsKey(Enchantments.SILK_TOUCH) && dropExperience1;
