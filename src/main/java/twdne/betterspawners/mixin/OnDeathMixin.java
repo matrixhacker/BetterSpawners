@@ -32,12 +32,12 @@ public abstract class OnDeathMixin {
 
 		// Search for nearby spawner and update with mob if found
 		ServerWorld world = (ServerWorld) entity.getWorld();
+
 		world.getPointOfInterestStorage().getPositions(
-			pointOfInterestTypeRegistryEntry -> true,
-			blockPos -> {
-				// Check that located POI spawner is blank.
-				return new BetterSpawnerBlock(world, blockPos).isBlankSpawner();
-			},
+			// Check that the POI type is correct
+			pointOfInterestTypeRegistryEntry -> pointOfInterestTypeRegistryEntry.value() == BetterSpawnerBlock.POI_SPAWNER,
+			// Check that located POI spawner is blank.
+			blockPos -> new BetterSpawnerBlock(world, blockPos).isBlankSpawner(),
 			entity.getBlockPos(),
 			BetterSpawnerBlock.POI_SPAWNER.searchDistance(),
 			PointOfInterestStorage.OccupationStatus.ANY
