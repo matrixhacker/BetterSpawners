@@ -18,6 +18,8 @@ Features:
 This fabric mod is server side only and makes no changes client side. Install in the mods folder of your dedicated server or single player world.
 A config file will be generated on the first run with descriptions of each configuration. It only requires the [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api/).
 
+Config: <b>betterspawners.json</b>
+<br/>
 The following configurations are available:
 <br/>
 <table>
