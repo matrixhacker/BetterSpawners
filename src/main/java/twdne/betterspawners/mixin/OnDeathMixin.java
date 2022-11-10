@@ -3,6 +3,7 @@ package twdne.betterspawners.mixin;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import twdne.betterspawners.block.BetterSpawnerBlock;
+import twdne.betterspawners.config.ConfigManager;
 
 @Mixin(LivingEntity.class)
 public abstract class OnDeathMixin {
@@ -27,13 +29,13 @@ public abstract class OnDeathMixin {
 			return;
 
 		// Ignore if entity is not of accepted type
-		if (!(entity instanceof HostileEntity))
+		ConfigManager configManager = ConfigManager.getInstance();
+		if (!(configManager.SPAWN_SPECIFIC_MOBS.getValue().contains(entity.getType()) || (entity instanceof HostileEntity && configManager.SPAWN_HOSTILE_MOBS.getValue()) || (entity instanceof PassiveEntity && configManager.SPAWN_PASSIVE_MOBS.getValue())))
 			return;
 
 		// Search for nearby spawner and update with mob if found
 		ServerWorld world = (ServerWorld) entity.getWorld();
-
-		world.getPointOfInterestStorage().getPositions(
+		world.getPointOfInterestStorage().getPosition(
 			// Check that the POI type is correct
 			pointOfInterestTypeRegistryEntry -> pointOfInterestTypeRegistryEntry.value() == BetterSpawnerBlock.POI_SPAWNER,
 			// Check that located POI spawner is blank.
@@ -41,9 +43,9 @@ public abstract class OnDeathMixin {
 			entity.getBlockPos(),
 			BetterSpawnerBlock.POI_SPAWNER.searchDistance(),
 			PointOfInterestStorage.OccupationStatus.ANY
-		).findAny().ifPresent(blockPos -> {
+		).ifPresent(
 			// Found nearby blank spawner. Update with mob entity.
-			new BetterSpawnerBlock(world, blockPos).updateSpawnerEntity(entity.getType());
-		});
+			blockPos -> new BetterSpawnerBlock(world, blockPos).updateSpawnerEntity(entity.getType())
+		);
 	}
 }

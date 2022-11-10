@@ -12,7 +12,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EndCrystalItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -25,6 +24,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.MobSpawnerLogic;
 import net.minecraft.world.World;
 import net.minecraft.world.poi.PointOfInterestType;
+import twdne.betterspawners.config.ConfigManager;
 
 import java.util.Objects;
 
@@ -35,6 +35,7 @@ public class BetterSpawnerBlock {
 	private final EntityType<?> blankSpawnerType = EntityType.AREA_EFFECT_CLOUD;
 
 	public static final PointOfInterestType POI_SPAWNER = PointOfInterestHelper.register(new Identifier("spawner"), 1, 2, Blocks.SPAWNER);
+	private static final ConfigManager configManager = ConfigManager.getInstance();
 
 	/**
 	 * Needed so that the POI is initialized before the registry is frozen.
@@ -56,8 +57,8 @@ public class BetterSpawnerBlock {
 	 */
 	public boolean onBlockBreak(PlayerEntity player, BlockEntity entity) {
 		// Pass if disabled in config
-//        if(ConfigValues.get("disable_silk_spawner") != 0)
-//            return ActionResult.PASS;
+		if (!configManager.SILKTOUCH.getValue())
+			return true;
 
 		// Get item enchantments
 		NbtList enchants = Iterables.get(player.getHandItems(), 0).getEnchantments();
@@ -103,11 +104,11 @@ public class BetterSpawnerBlock {
 	 */
 	public ActionResult onBlockInteract(PlayerEntity player, Hand hand) {
 		// Pass if disabled in config
-//        if(ConfigValues.get("disable_change_spawner") != 0)
-//            return ActionResult.PASS;
+		if (!configManager.BLANK_SPAWNER.getValue())
+            return ActionResult.PASS;
 
-		// Pass if off-hand action or not End Crystal
-		if (hand == Hand.OFF_HAND || !(player.getMainHandStack().getItem() instanceof EndCrystalItem))
+		// Pass if off-hand action or not BLANK_SPAWNER_ITEM
+		if (hand == Hand.OFF_HAND || !(player.getMainHandStack().getItem().equals(configManager.BLANK_SPAWNER_ITEM.getValue())))
 			return ActionResult.PASS;
 
 		// Clear entity from spawner. Since a spawner must have an entity use blankSpawnerType.
