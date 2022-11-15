@@ -8,9 +8,11 @@ Features:
 <ul>
     <li>Mine spawners with any tool enchanted with silk touch.</li>
     <li>Clear a spawner's monster by using a specific item on it.</li>
-    <li>Once cleared a spawner will begin spawning the next mob to die within 2 blocks of it, if that mob spawnable.</li>
+    <li>Once cleared a spawner will begin spawning the next mob to die within a configured radius of it, if that mob is spawnable.</li>
     <li>The item used to clear a spawner is configurable.</li>
     <li>The mobs a spawner can be set to spawn are configurable.</li>
+    <li>The silktouch enchanted tools that may be used to mine a spawner are configurable.</li>
+    <li>The radius around a blank spawner in which a mob's death will cause the spawner to spawn it is configurable.</li>
 </ul>
 
 ## Setup
@@ -55,8 +57,22 @@ The following configurations are available:
     </tr>
     <tr>
         <td>enable_spawner_mob_list</td>
-        <td>[]</td>
+        <td>[ ]</td>
         <td>A comma separated list of mobs a spawner can be set to spawn. This can override disabled hostile and passive mobs.</td>
+    </tr>
+    <tr>
+        <td>spawner_death_radius</td>
+        <td>2</td>
+        <td>
+            The radius within a mob must die from a blank spawner for it to spawn that mob, if mob is configured to be spawnable.<br/>
+            Min: 1<br/>
+            Max: 48
+        </td>
+    </tr>
+    <tr>
+        <td>spawner_mining_tools</td>
+        <td>[ Stone Pickaxe, Iron Pickaxe, Golden Pickaxe, Diamond Pickaxe, Netherite Pickaxe ]</td>
+        <td>The silktouch tools that can be used to mine a spawner. This does not affect mining speed.</td>
     </tr>
 </table>
 
@@ -66,4 +82,4 @@ This mod is available under the CC0 license. Feel free to learn from it and inco
 
 ## Remarks
 
-Special thanks to LoadDeatHunter who created SilkSpawners, which served as an inspiration for this mod.
+Special thanks to LordDeatHunter who created SilkSpawners, which served as an inspiration for this mod.

@@ -1,6 +1,5 @@
 package twdne.betterspawners.block;
 
-import com.google.common.collect.Iterables;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -14,7 +13,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -24,27 +22,37 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.MobSpawnerLogic;
 import net.minecraft.world.World;
 import net.minecraft.world.poi.PointOfInterestType;
-import twdne.betterspawners.config.ConfigManager;
+import twdne.betterspawners.BetterSpawners;
 
 import java.util.Objects;
 
+/**
+ * Contains logic for handling Spawner blocks when broken or interacted with.
+ */
 public class BetterSpawnerBlock {
-
 	private final World world;
 	private final BlockPos spawnerBlockPos;
 	private final EntityType<?> blankSpawnerType = EntityType.AREA_EFFECT_CLOUD;
 
-	public static final PointOfInterestType POI_SPAWNER = PointOfInterestHelper.register(new Identifier("spawner"), 1, 2, Blocks.SPAWNER);
-	private static final ConfigManager configManager = ConfigManager.getInstance();
+	/**
+	 * Register a Spawner block as a PointOfInterestType that it is searchable
+	 */
+	public static final PointOfInterestType POI_SPAWNER = PointOfInterestHelper.register(new Identifier("spawner"), 1, BetterSpawners.SPAWNER_DEATH_RADIUS.getValue(), Blocks.SPAWNER);
 
 	/**
 	 * Needed so that the POI is initialized before the registry is frozen.
 	 */
 	public static void init() {}
 
-	public BetterSpawnerBlock(World world_, BlockPos spawnerBlockPos_) {
-		world = world_;
-		spawnerBlockPos = spawnerBlockPos_;
+	/**
+	 * Saves the details for a spawner block found in the world.
+	 * Throws an IllegalArgumentException if the block at spawnerBlockPos is not a spawner
+	 * @param world - the world the spawner block is in
+	 * @param spawnerBlockPos - the position of the spawner block
+	 */
+	public BetterSpawnerBlock(World world, BlockPos spawnerBlockPos) {
+		this.world = world;
+		this.spawnerBlockPos = spawnerBlockPos;
 		if (world.getBlockState(spawnerBlockPos).getBlock() != Blocks.SPAWNER)
 			throw new IllegalArgumentException("Block at pos " + spawnerBlockPos + " is not of type SPAWNER.");
 	}
@@ -53,20 +61,21 @@ public class BetterSpawnerBlock {
 	 * I wanted to do this in a loot table as json files are simpler.
 	 * Unfortunately I was unable to drop a spawner with a custom name based on the spawned entity.
 	 * This method is less simplistic but perfectly functional.
+	 * @param player - the player
+	 * @param entity - the entity
 	 * @return always true since false would break the callback cycle.
 	 */
 	public boolean onBlockBreak(PlayerEntity player, BlockEntity entity) {
 		// Pass if disabled in config
-		if (!configManager.SILKTOUCH.getValue())
+		if (!BetterSpawners.SILKTOUCH.getValue())
 			return true;
 
-		// Get item enchantments
-		NbtList enchants = Iterables.get(player.getHandItems(), 0).getEnchantments();
-
-		// Spawn spawner with correct name and data if item has silk touch
-		if (!enchants.asString().contains("silk_touch"))
+		// Pass if item is not in list of mining tools or does not have silktouch
+		ItemStack stack = player.getMainHandStack();//Iterables.get(player.getHandItems(), 0);
+		if (!BetterSpawners.SPAWNER_MINING_TOOLS.getValue().contains(stack.getItem()) || !stack.getEnchantments().asString().contains("silk_touch"))
 			return true;
 
+		// Spawn spawner with correct name and data
 		MobSpawnerLogic logic = ((MobSpawnerBlockEntity) entity).getLogic();
 
 		// Copy current spawner data to new spawner
@@ -100,15 +109,17 @@ public class BetterSpawnerBlock {
 	/**
 	 * Called when player right-clicks a spawner block.
 	 * Will clear the spawn entity from a spawner if holding an end crystal.
+	 * @param player - the player
+	 * @param hand - the player's hand
 	 * @return PASS when no action is required, SUCCESS otherwise
 	 */
 	public ActionResult onBlockInteract(PlayerEntity player, Hand hand) {
 		// Pass if disabled in config
-		if (!configManager.BLANK_SPAWNER.getValue())
+		if (!BetterSpawners.BLANK_SPAWNER.getValue())
             return ActionResult.PASS;
 
 		// Pass if off-hand action or not BLANK_SPAWNER_ITEM
-		if (hand == Hand.OFF_HAND || !(player.getMainHandStack().getItem().equals(configManager.BLANK_SPAWNER_ITEM.getValue())))
+		if (hand == Hand.OFF_HAND || !(player.getMainHandStack().getItem().equals(BetterSpawners.BLANK_SPAWNER_ITEM.getValue())))
 			return ActionResult.PASS;
 
 		// Clear entity from spawner. Since a spawner must have an entity use blankSpawnerType.
@@ -123,6 +134,7 @@ public class BetterSpawnerBlock {
 
 	/**
 	 * Update the spawner with the supplied entity type.
+	 * @param spawnEntityType - the EntityType being spawned
 	 */
 	public void updateSpawnerEntity(EntityType<?> spawnEntityType) {
 		BlockState spawnerState = world.getBlockState(spawnerBlockPos);

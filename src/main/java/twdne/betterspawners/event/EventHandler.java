@@ -15,6 +15,12 @@ public class EventHandler {
 
 	/**
 	 * Called when player breaks a block.
+	 * @param world - the world
+	 * @param player - the player
+	 * @param pos - the position of the broken block
+	 * @param state - the state of the broken block
+	 * @param entity - the entity of the broken block
+	 * @return always true since false would break the callback cycle.
 	 */
 	public boolean onBlockBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity entity) {
 
@@ -31,6 +37,11 @@ public class EventHandler {
 
 	/**
 	 * Called when player right-clicks a block.
+	 * @param player - the player
+	 * @param world - the world
+	 * @param hand - the player's hand
+	 * @param hitResult - the result of the interaction
+	 * @return ActionResult.PASS when no action is required, ActionResult.SUCCESS otherwise
 	 */
 	public ActionResult onBlockInteract(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
 

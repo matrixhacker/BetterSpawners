@@ -12,6 +12,8 @@ public class BlockItemMixin {
 
 	/**
 	 * Allow copy of nbt spawn data from spawner blocks
+	 * @param blockEntity - the block entity
+	 * @return true if write permitted, false otherwise
 	 */
 	@Redirect(method = "writeNbtToBlockEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;copyItemDataRequiresOperator()Z"))
 	private static boolean writeTagToBlockEntity(BlockEntity blockEntity) {

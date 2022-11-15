@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import twdne.betterspawners.BetterSpawners;
 import twdne.betterspawners.block.BetterSpawnerBlock;
-import twdne.betterspawners.config.ConfigManager;
 
 @Mixin(LivingEntity.class)
 public abstract class OnDeathMixin {
@@ -19,6 +19,8 @@ public abstract class OnDeathMixin {
 	/**
 	 * On entity death, if type of configured entity, look for nearby blank spawner blocks
 	 * and update spawned entity type if found.
+	 * @param damageSource - source of damange
+	 * @param ci - callback info
 	 */
 	@Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setPose(Lnet/minecraft/entity/EntityPose;)V"), method = "onDeath")
 	public void checkDeathNearBlankSpawner(DamageSource damageSource, CallbackInfo ci) {
@@ -29,8 +31,7 @@ public abstract class OnDeathMixin {
 			return;
 
 		// Ignore if entity is not of accepted type
-		ConfigManager configManager = ConfigManager.getInstance();
-		if (!(configManager.SPAWN_SPECIFIC_MOBS.getValue().contains(entity.getType()) || (entity instanceof HostileEntity && configManager.SPAWN_HOSTILE_MOBS.getValue()) || (entity instanceof PassiveEntity && configManager.SPAWN_PASSIVE_MOBS.getValue())))
+		if (!(BetterSpawners.SPAWN_SPECIFIC_MOBS.getValue().contains(entity.getType()) || (entity instanceof HostileEntity && BetterSpawners.SPAWN_HOSTILE_MOBS.getValue()) || (entity instanceof PassiveEntity && BetterSpawners.SPAWN_PASSIVE_MOBS.getValue())))
 			return;
 
 		// Search for nearby spawner and update with mob if found
