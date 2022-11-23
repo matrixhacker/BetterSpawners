@@ -6,19 +6,16 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.MobSpawnerLogic;
 import net.minecraft.world.World;
 import net.minecraft.world.poi.PointOfInterestType;
@@ -32,7 +29,6 @@ import java.util.Objects;
 public class BetterSpawnerBlock {
 	private final World world;
 	private final BlockPos spawnerBlockPos;
-	private final EntityType<?> blankSpawnerType = EntityType.AREA_EFFECT_CLOUD;
 
 	/**
 	 * Register a Spawner block as a PointOfInterestType that it is searchable
@@ -58,9 +54,7 @@ public class BetterSpawnerBlock {
 	}
 
 	/**
-	 * I wanted to do this in a loot table as json files are simpler.
-	 * Unfortunately I was unable to drop a spawner with a custom name based on the spawned entity.
-	 * This method is less simplistic but perfectly functional.
+	 * Drop a spawner with correct mob spawn data if configured to do so.
 	 * @param player - the player
 	 * @param entity - the entity
 	 * @return always true since false would break the callback cycle.
@@ -71,27 +65,18 @@ public class BetterSpawnerBlock {
 			return true;
 
 		// Pass if item is not in list of mining tools or does not have silktouch
-		ItemStack stack = player.getMainHandStack();//Iterables.get(player.getHandItems(), 0);
+		ItemStack stack = player.getMainHandStack();
 		if (!BetterSpawners.SPAWNER_MINING_TOOLS.getValue().contains(stack.getItem()) || !stack.getEnchantments().asString().contains("silk_touch"))
 			return true;
 
-		// Spawn spawner with correct name and data
-		MobSpawnerLogic logic = ((MobSpawnerBlockEntity) entity).getLogic();
-
 		// Copy current spawner data to new spawner
+		MobSpawnerLogic logic = ((MobSpawnerBlockEntity) entity).getLogic();
 		NbtCompound nbt = logic.writeNbt(new NbtCompound());
-		ItemStack itemStack = new ItemStack(Registry.ITEM.get(new Identifier("spawner")));
+		ItemStack itemStack = new ItemStack(Registries.ITEM.get(new Identifier("spawner")));
 		NbtCompound new_nbt = new NbtCompound();
 		new_nbt.put("SpawnData", nbt.get("SpawnData"));
 		new_nbt.put("SpawnPotentials", nbt.get("SpawnPotentials"));
 		itemStack.setSubNbt("BlockEntityTag", new_nbt);
-
-		// Apply custom name
-		Entity spawn_entity = Objects.requireNonNull(logic.getRenderedEntity(world));
-		if (!(spawn_entity instanceof AreaEffectCloudEntity)) {
-			String entity_name = spawn_entity.getName().getString();
-			itemStack.setCustomName(Text.of(entity_name + " Spawner"));
-		}
 
 		// Get random fly-out position offsets
 		double d0 = (double) (world.getRandom().nextFloat() * 0.6F) + (double) 0.12F;
@@ -122,8 +107,8 @@ public class BetterSpawnerBlock {
 		if (hand == Hand.OFF_HAND || !(player.getMainHandStack().getItem().equals(BetterSpawners.BLANK_SPAWNER_ITEM.getValue())))
 			return ActionResult.PASS;
 
-		// Clear entity from spawner. Since a spawner must have an entity use blankSpawnerType.
-		updateSpawnerEntity(blankSpawnerType);
+		// Clear entity from spawner.
+		updateSpawnerEntity(null);
 
 		// Consume item if not in creative mode
 		if (!player.isCreative())
@@ -139,8 +124,15 @@ public class BetterSpawnerBlock {
 	public void updateSpawnerEntity(EntityType<?> spawnEntityType) {
 		BlockState spawnerState = world.getBlockState(spawnerBlockPos);
 		MobSpawnerBlockEntity spawner = Objects.requireNonNull((MobSpawnerBlockEntity) world.getBlockEntity(spawnerBlockPos));
-		spawner.getLogic().setEntityId(spawnEntityType);
-		spawner.readNbt(spawner.getLogic().writeNbt(new NbtCompound()));
+
+		// Update spawner entity; overwrite SpawnData nbt with blank data if new entity is null
+		spawner.getLogic().setEntityId(spawnEntityType, world, world.getRandom(), null);
+		NbtCompound nbt = spawner.getLogic().writeNbt(new NbtCompound());
+		if (spawnEntityType == null)
+			nbt.put("SpawnData", new NbtCompound());
+		spawner.readNbt(nbt);
+
+		// Mark dirty and update listeners so clients know
 		spawner.markDirty();
 		world.updateListeners(spawnerBlockPos, spawnerState, spawnerState, Block.NOTIFY_ALL);
 	}
@@ -150,6 +142,6 @@ public class BetterSpawnerBlock {
 	 * @return true if blank and within configured distance; false otherwise
 	 */
 	public boolean isBlankSpawner() {
-		return Objects.requireNonNull(((MobSpawnerBlockEntity) Objects.requireNonNull(world.getBlockEntity(spawnerBlockPos))).getLogic().getRenderedEntity(world)).getType() == blankSpawnerType;
+		return ((MobSpawnerBlockEntity) Objects.requireNonNull(world.getBlockEntity(spawnerBlockPos))).getLogic().getRenderedEntity(world, world.getRandom(), null) == null;
 	}
 }

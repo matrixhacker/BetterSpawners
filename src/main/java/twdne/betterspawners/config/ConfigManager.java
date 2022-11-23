@@ -7,8 +7,8 @@ import com.google.gson.JsonSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import twdne.betterspawners.BetterSpawners;
 
 import java.io.*;
@@ -133,12 +133,12 @@ public class ConfigManager {
 	/**
 	 * Convenience function to parse an Item from its String representation
 	 */
-	public static final Function<String, Item> parseItem = str -> Registry.ITEM.getOrEmpty(cleanIdentifier(str)).orElse(null);
+	public static final Function<String, Item> parseItem = str -> Registries.ITEM.getOrEmpty(cleanIdentifier(str)).orElse(null);
 
 	/**
 	 * Convenience function to parse an EntityType from its String representation
 	 */
-	public static final Function<String, EntityType<?>> parseEntityType = str -> Registry.ENTITY_TYPE.getOrEmpty(cleanIdentifier(str)).orElse(null);
+	public static final Function<String, EntityType<?>> parseEntityType = str -> Registries.ENTITY_TYPE.getOrEmpty(cleanIdentifier(str)).orElse(null);
 
 	/**
 	 * Convenience function to parse a List of any type from its String representation
